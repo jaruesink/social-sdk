@@ -91,7 +91,6 @@ const implementationPaths = new Map<string, readonly string[]>([
   ["stories.publish", ["native.publishStory"]],
   ["hashtags.search", ["native.hashtagSearch"]],
   ["publishing.limit.read", ["native.publishingLimit"]],
-  ["product.tagging", ["native.publishReel"]],
   ["thumbnails.write", ["native.setThumbnail"]],
   ["captions.read", ["native.captions"]],
   ["captions.write", ["native.captions"]],
@@ -107,7 +106,6 @@ const implementationPaths = new Map<string, readonly string[]>([
   ["reactions.write", ["native.react"]],
   ["reshares.write", ["native.reshare"]],
   ["analytics.organization.read", ["native.organizationAnalytics"]],
-  ["articles.create", ["native.updatePost"]],
 ]);
 
 function isObject(value: unknown): value is object {
@@ -118,7 +116,15 @@ function isCallable(value: unknown): value is CallableFunction {
   return typeof value === "function";
 }
 
-const cell = (value: string) => value.replaceAll("|", "\\|").replaceAll("\n", " ");
+const cell = (value: string) =>
+  value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("{", "&#123;")
+    .replaceAll("}", "&#125;")
+    .replaceAll("|", "\\|")
+    .replaceAll("\n", " ");
 
 const rows = [];
 
@@ -153,7 +159,7 @@ for (const adapter of adapterNames) {
 
   for (const entry of manifest.capabilities)
     rows.push(
-      `| ${cell(adapter)} | ${cell(entry.platform)} | ${cell(entry.operation)} | ${cell(entry.availability)} | ${cell((entry.formats ?? []).join(", ") || "None declared")} | ${cell((entry.requiredScopes ?? []).join(", ") || "See adapter setup")} |`,
+      `| ${cell(adapter)} | ${cell(entry.platform)} | ${cell(entry.operation)} | ${cell(entry.availability)} | ${cell((entry.formats ?? []).join(", ") || "None declared")} | ${cell((entry.requiredScopes ?? []).join(", ") || "See adapter setup")} | ${cell(entry.notes ?? "None declared")} |`,
     );
 }
 
@@ -166,9 +172,21 @@ This table is generated from the same manifests used by local preparation and th
 
 An omitted operation is unsupported through the normalized API. Some operations need several permissions, and token/product restrictions can differ between member and organization accounts. The setup guide and current provider documentation determine the permissions for your account.
 
-| Backend | Platform | Operation | Declaration | Formats | Scope guidance |
-| --- | --- | --- | --- | --- | --- |
+Diagnostic manifests use one fixed setup per adapter: Instagram Login for Instagram and a member author for LinkedIn. Facebook Login deletion and organization-only analytics can therefore appear unavailable in this table. Create the adapter with your actual flavor or author to inspect its declarations.
+
+The adapter ID below identifies the implementation, such as \`instagram\` or \`zernio\`. It is not your configured backend instance key: references use the key registered with \`createSocial\`, such as \`default\` or \`company\`.
+
+| Adapter ID | Platform | Operation | Declaration | Formats | Scope guidance | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
 ${rows.join("\n")}
+
+## Capability IDs and methods
+
+Capability IDs describe routes, not necessarily method names. Native routes require explicit unsafe access and their own authorization checks.
+
+| Capability ID | Implementation method(s) |
+| --- | --- |
+${[...implementationPaths].map(([operation, paths]) => `| ${cell(operation)} | ${cell(paths.join(", "))} |`).join("\n")}
 
 Generate this page with \`bun scripts/generate-capabilities.ts\`. CI uses \`--check\` to detect drift. The complete manifests, including API revisions, runtimes and notes, are returned by \`social-sdk capabilities --adapter NAME --json\`.
 `;
