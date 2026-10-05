@@ -411,7 +411,8 @@ export function zernio(options: ManagedOptions) {
           native["privacyLevel"] = string(config["privacy"]);
           native["contentPreviewConfirmed"] = true;
           native["expressConsentGiven"] = true;
-          native["autoAddMusic"] = false;
+          native["autoAddMusic"] =
+            isBoolean(config["autoAddMusic"]) ? config["autoAddMusic"] : false;
           native["allowDuet"] = !config["disableDuet"];
           native["allowStitch"] = !config["disableStitch"];
 
@@ -427,17 +428,28 @@ export function zernio(options: ManagedOptions) {
             if (value !== undefined) native[nativeKey] = value;
           }
 
-          const { photoCoverIndex, disableComments, brandedContent } = config;
+          const { photoCoverIndex, disableComments, brandedContent, description, mediaType } =
+            config;
 
           if (isFiniteNumber(photoCoverIndex)) native["photoCoverIndex"] = photoCoverIndex;
 
           if (isBoolean(disableComments)) native["allowComment"] = !disableComments;
 
           if (isBoolean(brandedContent)) native["brandPartnerPromote"] = brandedContent;
+
+          if (isString(description)) native["description"] = description;
+
+          if (mediaType === "photo") native["mediaType"] = "photo";
         }
 
+        // Zernio photo posts: `content` is the photo title (≤90). Prefer options.title when set.
+        const tiktokTitle =
+          target.account.platform === "tiktok" && isString(config["title"])
+            ? string(config["title"])
+            : undefined;
+
         const response = await request("/v1/posts", context, {
-          content: target.content.text ?? "",
+          content: tiktokTitle ?? target.content.text ?? "",
           mediaItems: media,
           platforms: [
             {
