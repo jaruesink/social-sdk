@@ -412,13 +412,15 @@ export function zernio(options: ManagedOptions) {
           native["replySettings"] = string(config["replySettings"]);
 
         if (target.account.platform === "tiktok") {
-          const video = media.length === 1 && media[0]?.["kind"] === "video";
+          const video = media.length === 1 && media[0]?.["type"] === "video";
+          const photo = media.length > 0 && media.every((item) => item["type"] === "image");
           native["privacyLevel"] = string(config["privacy"]);
           native["contentPreviewConfirmed"] = true;
           native["expressConsentGiven"] = true;
-          native["autoAddMusic"] = video
-            ? false
-            : isBoolean(config["autoAddMusic"])
+
+          if (video) native["autoAddMusic"] = false;
+          else if (photo)
+            native["autoAddMusic"] = isBoolean(config["autoAddMusic"])
               ? config["autoAddMusic"]
               : false;
           native["allowDuet"] = !config["disableDuet"];
@@ -445,21 +447,19 @@ export function zernio(options: ManagedOptions) {
 
           if (isBoolean(brandedContent)) native["brandPartnerPromote"] = brandedContent;
 
-          if (!video && isString(description)) native["description"] = description;
+          if (photo && isString(description)) native["description"] = description;
 
-          if (!video && mediaType === "photo") native["mediaType"] = "photo";
+          if (photo && mediaType === "photo") native["mediaType"] = "photo";
         }
 
         // Zernio photo posts: `content` is the photo title (≤90). Prefer options.title when set.
-        const tiktokVideo =
+        const tiktokPhoto =
           target.account.platform === "tiktok" &&
-          media.length === 1 &&
-          media[0]?.["kind"] === "video";
+          media.length > 0 &&
+          media.every((item) => item["type"] === "image");
 
         const tiktokTitle =
-          target.account.platform === "tiktok" && !tiktokVideo && isString(config["title"])
-            ? string(config["title"])
-            : undefined;
+          tiktokPhoto && isString(config["title"]) ? string(config["title"]) : undefined;
 
         try {
           const response = await request("/v1/posts", context, {

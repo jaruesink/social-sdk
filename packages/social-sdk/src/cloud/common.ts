@@ -347,6 +347,18 @@ export function managedOptionIssues(
 
       if (config["autoAddMusic"] !== undefined)
         fail("tiktok.auto_add_music", "autoAddMusic is a photo-only option.");
+    } else if (media.length === 0) {
+      if (config["title"] !== undefined)
+        fail("tiktok.title", "Photo titles require at least one image.");
+
+      if (config["description"] !== undefined)
+        fail("tiktok.description", "Photo descriptions require at least one image.");
+
+      if (config["mediaType"] !== undefined)
+        fail("tiktok.media_type", "mediaType requires at least one image.");
+
+      if (config["autoAddMusic"] !== undefined)
+        fail("tiktok.auto_add_music", "autoAddMusic requires at least one image.");
     } else {
       if (
         config["title"] !== undefined &&
