@@ -453,6 +453,7 @@ export function zernio(options: ManagedOptions) {
         // Zernio photo posts: `content` is the photo title (≤90). Prefer options.title when set.
         const tiktokVideo =
           target.account.platform === "tiktok" && media.length === 1 && media[0]?.kind === "video";
+
         const tiktokTitle =
           target.account.platform === "tiktok" && !tiktokVideo && isString(config["title"])
             ? string(config["title"])

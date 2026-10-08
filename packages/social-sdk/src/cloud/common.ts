@@ -338,10 +338,13 @@ export function managedOptionIssues(
     if (video) {
       if (config["title"] !== undefined)
         fail("tiktok.title", "Video captions use content.text; title is a photo-only option.");
+
       if (config["description"] !== undefined)
         fail("tiktok.description", "Description is a photo-only option.");
+
       if (config["mediaType"] !== undefined)
         fail("tiktok.media_type", "mediaType is a photo-only option.");
+
       if (config["autoAddMusic"] !== undefined)
         fail("tiktok.auto_add_music", "autoAddMusic is a photo-only option.");
     } else {
