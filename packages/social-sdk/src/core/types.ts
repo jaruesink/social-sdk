@@ -203,8 +203,8 @@ export interface TikTokPublishOptions {
   readonly disableStitch?: boolean;
   readonly brandedContent?: boolean;
   readonly ownBrand?: boolean;
-  readonly aiGenerated?: boolean;
-  readonly draft?: boolean;
+  readonly aiGenerated: boolean;
+  readonly draft: boolean;
   readonly photoCoverIndex?: number;
   /** Photo-post title (≤90). Zernio maps this onto `content` when set. */
   readonly title?: string;
@@ -289,7 +289,9 @@ export interface PublishSequenceFailure {
 
 export interface PublishSequenceResult {
   readonly status: PublicationStatus;
-  /** Results for items that were dispatched, in request order. Failed items are in `failures`. */
+  /** Returned publish results in request order, including results with failed outcomes.
+   * Items whose publish call throws a SocialError are omitted and recorded by index in `failures`.
+   * Items skipped after stopping or missing a published parent appear in neither array. */
   readonly items: readonly PublishResult[];
   readonly failures: readonly PublishSequenceFailure[];
 }
@@ -340,12 +342,16 @@ export type DeliveryOutcome =
       readonly url?: string;
     })
   | (OutcomeBase<"failed"> & {
+      /** Opaque upload ID retained for media recovery before another submission. */
+      readonly mediaId?: string;
       readonly code: string;
       readonly message: string;
       readonly retryDisposition: RetryDisposition;
     })
   | (OutcomeBase<"cancelled"> & { readonly reason?: string })
   | (OutcomeBase<"unknown"> & {
+      /** Opaque upload ID retained for media recovery before another submission. */
+      readonly mediaId?: string;
       readonly reason: "ambiguous-submission" | "unmapped-state";
       readonly diagnostic?: string;
     });

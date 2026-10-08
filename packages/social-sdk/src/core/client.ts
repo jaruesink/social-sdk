@@ -3,6 +3,7 @@ import { createConcurrencyLimiter } from "./concurrency.js";
 import type { AuthorizationPolicy, GraphAdapter, SocialAdapter } from "./adapter.js";
 import { SocialError } from "./errors.js";
 import { definedFields } from "./fields.js";
+import { isString } from "../transport/validation.js";
 import {
   deriveTargetIdempotencyKey,
   fingerprint,
@@ -376,12 +377,18 @@ function outcomeFromError(
   observedAt: string,
 ): DeliveryOutcome {
   if (error !== undefined) {
+    const candidate = error.operation === "media.upload" ? error.details?.["mediaId"] : undefined;
+
+    const mediaId =
+      isString(candidate) && /^[A-Za-z0-9_-]{1,256}$/.test(candidate) ? candidate : undefined;
+
     if (error.code === "cancelled") {
       return {
         state: "unknown",
         targetIndex: target.targetIndex,
         account: target.account,
         observedAt,
+        ...definedFields({ mediaId }),
         reason: "ambiguous-submission",
         diagnostic: "Cancellation interrupted a dispatched request; reconcile before retrying",
       };
@@ -393,6 +400,7 @@ function outcomeFromError(
         targetIndex: target.targetIndex,
         account: target.account,
         observedAt,
+        ...definedFields({ mediaId }),
         reason: "ambiguous-submission",
         diagnostic: "The request outcome is ambiguous; reconcile with the backend before retrying",
       };
@@ -403,6 +411,7 @@ function outcomeFromError(
       targetIndex: target.targetIndex,
       account: target.account,
       observedAt,
+      ...definedFields({ mediaId }),
       code: error.code,
       message: error.message,
       retryDisposition: error.retryDisposition,
@@ -608,13 +617,12 @@ export function createSocial(
         (replyTo.version !== 1 ||
           !["platform-post", "comment"].includes(replyTo.kind) ||
           replyTo.backend !== target.account.backend ||
-          replyTo.platform !== target.account.platform ||
-          replyTo.accountId !== target.account.accountId)
+          replyTo.platform !== target.account.platform)
       ) {
         issues.push(
           preparationIssue(
             "reply.reference_mismatch",
-            "Reply references must use the selected account, backend, and platform",
+            "Reply references must use the selected backend and platform",
             targetIndex,
           ),
         );
@@ -1533,6 +1541,12 @@ export function createSocial(
       ref: import("./types.js").DeliveryRef,
       callOptions?: PublishCallOptions,
     ): Promise<DeliveryOutcome> {
+      if (ref.kind !== "delivery" || ref.version !== 1)
+        throw new SocialError({
+          code: "invalid_input",
+          operation: "posts.getDelivery",
+          message: "Use the version 1 delivery reference returned for this resource.",
+        });
       const correlationId = `social-${++correlationSequence}`;
 
       const account = {

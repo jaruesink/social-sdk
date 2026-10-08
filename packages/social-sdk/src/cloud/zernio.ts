@@ -15,6 +15,7 @@ import type {
   CommentRef,
   ConnectedAccountRef,
   ConversationRef,
+  DeliveryOutcome,
   JsonObject,
   JsonValue,
   MetricValue,
@@ -323,12 +324,12 @@ export function zernio(options: ManagedOptions) {
                 accountId: account.accountId,
                 ...definedFields({
                   platformPostUrl: optionalString(destination["platformPostUrl"]),
+                  publishedAt: optionalString(destination["publishedAt"]),
                 }),
                 ...publicFields(row, [
                   "content",
                   "caption",
                   "createdAt",
-                  "publishedAt",
                   "status",
                   "isExternal",
                   "syncStatus",
@@ -373,7 +374,10 @@ export function zernio(options: ManagedOptions) {
 
         return issues;
       },
-      async publishTarget(target: PreparedPublishTarget, context: AdapterOperationContext) {
+      async publishTarget(
+        target: PreparedPublishTarget,
+        context: AdapterOperationContext,
+      ): Promise<DeliveryOutcome> {
         accountMatches(target.account, context);
         const media: JsonObject[] = [];
 
@@ -408,11 +412,15 @@ export function zernio(options: ManagedOptions) {
           native["replySettings"] = string(config["replySettings"]);
 
         if (target.account.platform === "tiktok") {
+          const video = media.length === 1 && media[0]?.kind === "video";
           native["privacyLevel"] = string(config["privacy"]);
           native["contentPreviewConfirmed"] = true;
           native["expressConsentGiven"] = true;
-          native["autoAddMusic"] =
-            isBoolean(config["autoAddMusic"]) ? config["autoAddMusic"] : false;
+          native["autoAddMusic"] = video
+            ? false
+            : isBoolean(config["autoAddMusic"])
+              ? config["autoAddMusic"]
+              : false;
           native["allowDuet"] = !config["disableDuet"];
           native["allowStitch"] = !config["disableStitch"];
 
@@ -437,42 +445,77 @@ export function zernio(options: ManagedOptions) {
 
           if (isBoolean(brandedContent)) native["brandPartnerPromote"] = brandedContent;
 
-          if (isString(description)) native["description"] = description;
+          if (!video && isString(description)) native["description"] = description;
 
-          if (mediaType === "photo") native["mediaType"] = "photo";
+          if (!video && mediaType === "photo") native["mediaType"] = "photo";
         }
 
         // Zernio photo posts: `content` is the photo title (≤90). Prefer options.title when set.
+        const tiktokVideo =
+          target.account.platform === "tiktok" &&
+          media.length === 1 &&
+          media[0]?.kind === "video";
         const tiktokTitle =
-          target.account.platform === "tiktok" && isString(config["title"])
+          target.account.platform === "tiktok" && !tiktokVideo && isString(config["title"])
             ? string(config["title"])
             : undefined;
 
-        const response = await request("/v1/posts", context, {
-          content: tiktokTitle ?? target.content.text ?? "",
-          mediaItems: media,
-          platforms: [
-            {
-              platform: target.account.platform === "x" ? "twitter" : target.account.platform,
-              accountId: target.account.accountId,
-              ...definedFields({
-                platformSpecificData: Object.keys(native).length ? native : undefined,
-              }),
-            },
-          ],
-          ...(target.schedule
-            ? {
-                scheduledFor: target.schedule.at,
-                ...definedFields({ timezone: target.schedule.timeZone || undefined }),
-              }
-            : { publishNow: true }),
-        });
+        try {
+          const response = await request("/v1/posts", context, {
+            content: tiktokTitle ?? target.content.text ?? "",
+            mediaItems: media,
+            platforms: [
+              {
+                platform: target.account.platform === "x" ? "twitter" : target.account.platform,
+                accountId: target.account.accountId,
+                ...definedFields({
+                  platformSpecificData: Object.keys(native).length ? native : undefined,
+                }),
+              },
+            ],
+            ...(target.schedule
+              ? {
+                  scheduledFor: target.schedule.at,
+                  ...definedFields({ timezone: target.schedule.timeZone || undefined }),
+                }
+              : { publishNow: true }),
+          });
 
-        return zernioOutcome(response, {
-          account: target.account,
-          targetIndex: target.targetIndex,
-          observedAt: now(),
-        });
+          return zernioOutcome(response, {
+            account: target.account,
+            targetIndex: target.targetIndex,
+            observedAt: now(),
+          });
+        } catch (error) {
+          const existingPostId =
+            error instanceof SocialError ? error.details?.["existingPostId"] : undefined;
+
+          if (
+            !(error instanceof SocialError) ||
+            error.code !== "idempotency_conflict" ||
+            !isString(existingPostId) ||
+            !/^[A-Za-z0-9_-]{1,128}$/.test(existingPostId)
+          )
+            throw error;
+
+          return {
+            state: "failed",
+            code: error.code,
+            message: error.message,
+            retryDisposition: error.retryDisposition,
+            targetIndex: target.targetIndex,
+            account: target.account,
+            observedAt: now(),
+            delivery: {
+              kind: "delivery",
+              version: 1,
+              backend: target.account.backend,
+              platform: target.account.platform,
+              accountId: target.account.accountId,
+              deliveryId: existingPostId,
+            },
+          };
+        }
       },
       async getDelivery(
         ref: { backend: string; platform: string; accountId: string; deliveryId: string },
@@ -667,6 +710,7 @@ export function zernio(options: ManagedOptions) {
             code: "ambiguous_outcome",
             operation: "comments.write",
             message: "Comment reply lacks a confirmed success result; reconcile before retrying.",
+            retryDisposition: { kind: "reconcile-first" },
           });
 
         return { ...ref, commentId: string(object(result["data"])["commentId"]) };
@@ -781,6 +825,7 @@ export function zernio(options: ManagedOptions) {
             code: "ambiguous_outcome",
             operation: "messages.write",
             message: "Message outcome is unconfirmed. Reconcile before retrying.",
+            retryDisposition: { kind: "reconcile-first" },
           });
         const data = object(result["data"]);
         const messageId = optionalString(data["messageId"]);

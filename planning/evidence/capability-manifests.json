@@ -2232,15 +2232,13 @@
           "operation": "webhooks.verify",
           "platform": "bluesky",
           "availability": "unsupported-by-platform",
-          "notes": "Bluesky has no signed webhook delivery. Events arrive over WebSocket streams you subscribe to: the relay firehose (com.atproto.sync.subscribeRepos) or Jetstream. See https://bsky.network/docs/consuming-the-firehose."
+          "notes": "Bluesky has no signed webhook delivery. Read the connected account inbox with notifications.list and markSeen. The firehose and Jetstream are network indexing streams; filtering by the connected DID watches its authored records, not inbound mentions or replies."
         },
         {
           "operation": "accounts.read",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "posts.publish",
@@ -2251,9 +2249,7 @@
             "image",
             "video"
           ],
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "posts.schedule",
@@ -2274,105 +2270,79 @@
           "operation": "graph.read",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "graph.follow",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "graph.unfollow",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "graph.block",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "graph.unblock",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "graph.mute",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "graph.unmute",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "likes.read",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "likes.write",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "lists.read",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "lists.write",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "profiles.search",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "moderation.report",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "posts.list",
@@ -2386,10 +2356,7 @@
         {
           "operation": "comments.read",
           "platform": "bluesky",
-          "availability": "available",
-          "formats": [
-            "text"
-          ]
+          "availability": "available"
         },
         {
           "operation": "analytics.read",
@@ -2412,9 +2379,7 @@
           "formats": [
             "text"
           ],
-          "requiredScopes": [
-            "repo"
-          ]
+          "notes": "App passwords authorize through the PDS. OAuth requires atproto plus appropriate repo:<collection>?action=... or rpc:<method> permissions, or the broad transition:generic grant. These are alternatives; inspect the returned grant."
         },
         {
           "operation": "posts.publish.video",
@@ -2423,18 +2388,12 @@
           "formats": [
             "video"
           ],
-          "requiredScopes": [
-            "repo"
-          ],
           "notes": "One MP4 per post from a media.upload reference. Publishing reads the video job once and creates the post only when the processed blob is ready; it never waits or polls."
         },
         {
           "operation": "comments.moderate",
           "platform": "bluesky",
           "availability": "available",
-          "requiredScopes": [
-            "repo"
-          ],
           "notes": "Native hideReply adds or removes a reply URI in the root post's threadgate hiddenReplies list. Only the root post's author can hide replies."
         },
         {
@@ -2444,9 +2403,6 @@
           "formats": [
             "video"
           ],
-          "requiredScopes": [
-            "repo"
-          ],
           "notes": "Uploads one video/mp4 Blob of at most 300,000,000 bytes to the Bluesky video service with a PDS service token. Returns the processing job ID as the media reference."
         },
         {
@@ -2455,9 +2411,6 @@
           "availability": "available",
           "formats": [
             "video"
-          ],
-          "requiredScopes": [
-            "repo"
           ],
           "notes": "native.uploadVideo sends one app.bsky.video.uploadVideo request and returns the job."
         },
@@ -2488,67 +2441,80 @@
         {
           "operation": "posts.repost",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "posts.quote",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "posts.delete",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "posts.removeFromPlatform",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "notifications.read",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "notifications.seen",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "profile.read",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "profiles.read",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "profile.update",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "feeds.read",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "search.posts",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "App passwords or operation-specific OAuth permissions are required for authenticated calls; inspect the returned grant."
         },
         {
           "operation": "chat.read",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "Native chat calls proxy through did:web:api.bsky.chat#bsky_chat. OAuth needs atproto transition:generic transition:chat.bsky in requested and metadata scopes, or appropriate rpc:chat.bsky... permissions; transition:generic alone excludes chat. Inspect returned grants. Application authorization is required."
         },
         {
           "operation": "chat.write",
           "platform": "bluesky",
-          "availability": "available"
+          "availability": "available",
+          "notes": "Native chat calls proxy through did:web:api.bsky.chat#bsky_chat. OAuth needs atproto transition:generic transition:chat.bsky in requested and metadata scopes, or appropriate rpc:chat.bsky... permissions; transition:generic alone excludes chat. Inspect returned grants. Application authorization is required."
         }
       ]
     }
@@ -2558,7 +2524,7 @@
     "manifest": {
       "schemaVersion": 1,
       "backend": "x",
-      "apiRevision": "X API v2 / OpenAPI 2.168",
+      "apiRevision": "X API v2 / OpenAPI 2.169 (checked 2026-10-05)",
       "runtime": [
         "node22",
         "node24",
@@ -2586,7 +2552,7 @@
             "users.read",
             "media.write"
           ],
-          "notes": "User-context OAuth2 token; current X API access/billing required. Up to four static JPEG/PNG image Blobs, each at most 5 MiB, or one MP4 video up to 512 MiB / one GIF up to 15 MiB via 1 MiB chunked upload with bounded processing poll. Post attach can still reject over-duration video with 403."
+          "notes": "User-context OAuth2 token; current X API access/billing required. Up to four static JPEG/PNG image Blobs, each at most 5 MiB, or one MP4 video up to the 16 GiB upload ceiling (account size/duration eligibility may be lower) / one GIF up to 15 MiB via 4 MiB chunked upload with bounded processing poll. Post attach can still reject over-duration video with 403. Self-serve replies require a parent-author mention or quote summoning this account; Enterprise is exempt (February 2026 changelog)."
         },
         {
           "platform": "x",
@@ -2620,12 +2586,23 @@
         {
           "platform": "x",
           "operation": "comments.write",
-          "availability": "available"
+          "availability": "available",
+          "requiredScopes": [
+            "tweet.read",
+            "tweet.write",
+            "users.read"
+          ],
+          "notes": "Self-serve replies require the parent author to have summoned the replying account by mentioning or quoting it. Enterprise is exempt (X February 2026 changelog)."
         },
         {
           "platform": "x",
           "operation": "posts.repost",
-          "availability": "available"
+          "availability": "available",
+          "requiredScopes": [
+            "tweet.read",
+            "tweet.write",
+            "users.read"
+          ]
         },
         {
           "platform": "x",
@@ -2635,7 +2612,8 @@
             "tweet.read",
             "tweet.write",
             "users.read"
-          ]
+          ],
+          "notes": "Enterprise-only operation per X's April 2026 changelog; endpoint access remains subject to X eligibility."
         },
         {
           "platform": "x",
@@ -2650,22 +2628,43 @@
         {
           "platform": "x",
           "operation": "polls.create",
-          "availability": "available"
+          "availability": "available",
+          "requiredScopes": [
+            "tweet.read",
+            "tweet.write",
+            "users.read"
+          ]
         },
         {
           "platform": "x",
           "operation": "bookmarks.read",
-          "availability": "available"
+          "availability": "available",
+          "requiredScopes": [
+            "bookmark.read",
+            "tweet.read",
+            "users.read"
+          ]
         },
         {
           "platform": "x",
           "operation": "bookmarks.write",
-          "availability": "available"
+          "availability": "available",
+          "requiredScopes": [
+            "bookmark.write",
+            "tweet.read",
+            "users.read"
+          ]
         },
         {
           "platform": "x",
           "operation": "follows.write",
-          "availability": "available"
+          "availability": "available",
+          "requiredScopes": [
+            "follows.write",
+            "tweet.read",
+            "users.read"
+          ],
+          "notes": "Enterprise-only operation per X's April 2026 changelog; endpoint access remains subject to X eligibility."
         },
         {
           "platform": "x",
@@ -2684,7 +2683,8 @@
             "like.read",
             "tweet.read",
             "users.read"
-          ]
+          ],
+          "notes": "Enterprise-only operation per X's April 2026 changelog; endpoint access remains subject to X eligibility."
         },
         {
           "platform": "x",
@@ -2694,7 +2694,8 @@
             "like.write",
             "tweet.read",
             "users.read"
-          ]
+          ],
+          "notes": "Enterprise-only operation per X's April 2026 changelog; endpoint access remains subject to X eligibility."
         },
         {
           "platform": "x",
@@ -2755,11 +2756,12 @@
           "availability": "available",
           "requiredScopes": [
             "users.read",
+            "tweet.read",
             "follows.read",
             "mute.read",
             "block.read"
           ],
-          "notes": "The required read scope depends on the requested relationship kind."
+          "notes": "Use follows.read for followers/following, mute.read for muted users, and block.read for blocked users, with tweet.read and users.read. Following access is Enterprise-only per X's April 2026 changelog; muted/blocked reads require user context."
         },
         {
           "platform": "x",
@@ -2775,9 +2777,10 @@
           "availability": "available",
           "requiredScopes": [
             "users.read",
+            "tweet.read",
             "follows.write"
           ],
-          "notes": "Follow writes require an eligible paid X API tier."
+          "notes": "Following operations require Enterprise access per X's April 2026 changelog."
         },
         {
           "platform": "x",
@@ -2785,9 +2788,10 @@
           "availability": "available",
           "requiredScopes": [
             "users.read",
+            "tweet.read",
             "follows.write"
           ],
-          "notes": "Follow writes require an eligible paid X API tier."
+          "notes": "Following operations require Enterprise access per X's April 2026 changelog."
         },
         {
           "platform": "x",
@@ -2795,6 +2799,7 @@
           "availability": "available",
           "requiredScopes": [
             "users.read",
+            "tweet.read",
             "mute.write"
           ]
         },
@@ -2804,6 +2809,7 @@
           "availability": "available",
           "requiredScopes": [
             "users.read",
+            "tweet.read",
             "mute.write"
           ]
         },
@@ -2813,6 +2819,7 @@
           "availability": "available",
           "requiredScopes": [
             "users.read",
+            "tweet.read",
             "block.write"
           ],
           "notes": "Enterprise plan only."
@@ -2823,6 +2830,7 @@
           "availability": "available",
           "requiredScopes": [
             "users.read",
+            "tweet.read",
             "block.write"
           ],
           "notes": "Enterprise plan only."
@@ -2833,6 +2841,7 @@
           "availability": "available",
           "requiredScopes": [
             "users.read",
+            "tweet.read",
             "list.read"
           ]
         },
@@ -2842,6 +2851,7 @@
           "availability": "available",
           "requiredScopes": [
             "users.read",
+            "tweet.read",
             "list.write"
           ]
         },
@@ -2850,7 +2860,9 @@
           "operation": "messages.conversation.write",
           "availability": "available",
           "requiredScopes": [
-            "dm.write"
+            "dm.write",
+            "users.read",
+            "tweet.read"
           ]
         },
         {
@@ -2858,7 +2870,9 @@
           "operation": "messages.group.write",
           "availability": "available",
           "requiredScopes": [
-            "dm.write"
+            "dm.write",
+            "users.read",
+            "tweet.read"
           ]
         },
         {
@@ -2894,7 +2908,7 @@
             "users.read",
             "media.write"
           ],
-          "notes": "MP4 Blob chunked INIT/APPEND/FINALIZE with 1 MiB segments and bounded STATUS poll honoring check_after_secs."
+          "notes": "MP4 Blob chunked INIT/APPEND/FINALIZE with 4 MiB segments and bounded STATUS poll honoring check_after_secs."
         },
         {
           "platform": "x",
@@ -3060,7 +3074,7 @@
           "availability": "available",
           "requiredScopes": [
             "threads_basic",
-            "threads_manage_replies"
+            "threads_content_publish"
           ]
         },
         {
@@ -3068,6 +3082,7 @@
           "platform": "threads",
           "availability": "available",
           "requiredScopes": [
+            "threads_basic",
             "threads_manage_replies"
           ],
           "notes": "Hiding replies and pending-reply moderation require Threads reply-management permissions."
@@ -3418,7 +3433,7 @@
           "requiredScopes": [
             "https://www.googleapis.com/auth/youtube.readonly"
           ],
-          "notes": "Uses search.list with type=video. Each request costs 100 quota units."
+          "notes": "Uses search.list with type=video. Each page request costs 1 unit in a separate search quota bucket with a default limit of 100 calls per day."
         },
         {
           "operation": "comments.moderate",
@@ -3654,30 +3669,43 @@
           "availability": "available"
         },
         {
-          "operation": "comments.read",
-          "platform": "instagram",
-          "availability": "available"
-        },
-        {
-          "operation": "comments.write",
-          "platform": "instagram",
-          "availability": "available"
-        },
-        {
-          "operation": "analytics.read",
-          "platform": "instagram",
-          "availability": "available"
-        },
-        {
           "operation": "analytics.account.read",
           "platform": "instagram",
           "availability": "available"
         },
         {
           "platform": "instagram",
+          "operation": "comments.read",
+          "availability": "available",
+          "requiredScopes": [
+            "instagram_business_basic",
+            "instagram_business_manage_comments"
+          ]
+        },
+        {
+          "platform": "instagram",
+          "operation": "comments.write",
+          "availability": "available",
+          "requiredScopes": [
+            "instagram_business_basic",
+            "instagram_business_manage_comments"
+          ]
+        },
+        {
+          "platform": "instagram",
+          "operation": "analytics.read",
+          "availability": "available",
+          "requiredScopes": [
+            "instagram_business_basic",
+            "instagram_business_manage_insights"
+          ]
+        },
+        {
+          "platform": "instagram",
           "operation": "comments.moderate",
           "availability": "available",
           "requiredScopes": [
+            "instagram_business_basic",
             "instagram_business_manage_comments"
           ],
           "notes": "Hide or unhide a comment, or enable or disable comments on media. Instagram Login and Facebook Login are supported where the account and app permissions qualify."
@@ -3687,6 +3715,7 @@
           "operation": "comments.delete",
           "availability": "available",
           "requiredScopes": [
+            "instagram_business_basic",
             "instagram_business_manage_comments"
           ]
         },
@@ -3695,6 +3724,7 @@
           "operation": "comments.replies.read",
           "availability": "available",
           "requiredScopes": [
+            "instagram_business_basic",
             "instagram_business_manage_comments"
           ]
         },
@@ -3703,8 +3733,7 @@
           "operation": "profiles.read",
           "availability": "available",
           "requiredScopes": [
-            "instagram_business_basic",
-            "instagram_business_manage_insights"
+            "instagram_business_basic"
           ]
         },
         {
@@ -3756,12 +3785,14 @@
         {
           "platform": "instagram",
           "operation": "product.tagging",
-          "availability": "approval-dependent"
+          "availability": "unsupported-by-platform",
+          "notes": "Product tagging is unavailable with Instagram Login."
         },
         {
           "platform": "instagram",
           "operation": "messages.read",
-          "availability": "approval-dependent"
+          "availability": "not-implemented-by-adapter",
+          "notes": "The adapter does not implement messaging reads."
         },
         {
           "platform": "instagram",
@@ -3804,7 +3835,7 @@
           "requiredScopes": [
             "w_member_social"
           ],
-          "notes": "Explicit author URN and public visibility. Organization role and app product approval required. One registered image, 2 to 20 images, one MP4 video, or one document per post; every asset must be AVAILABLE before creating a post."
+          "notes": "Explicit member author and public visibility. Requires w_member_social from Share on LinkedIn; no organization role is needed. Supports image, multi-image, video and document posts."
         },
         {
           "platform": "linkedin",
@@ -3819,7 +3850,7 @@
           "requiredScopes": [
             "r_member_social"
           ],
-          "notes": "Member read access is restricted. Publication permission does not grant read permission."
+          "notes": "Member post reads require the closed r_member_social grant, unavailable to new apps. Publication permission does not grant read permission."
         },
         {
           "platform": "linkedin",
@@ -3875,7 +3906,10 @@
         {
           "platform": "linkedin",
           "operation": "reactions.write",
-          "availability": "available"
+          "availability": "available",
+          "requiredScopes": [
+            "w_member_social_feed"
+          ]
         },
         {
           "platform": "linkedin",
@@ -3902,7 +3936,7 @@
           "operation": "comments.delete",
           "availability": "available",
           "requiredScopes": [
-            "w_member_social"
+            "w_member_social_feed"
           ],
           "notes": "Native deleteComment needs the post URN and the complete commentUrn. LinkedIn does not document which comments an actor may delete; expect only the configured author's own comments to succeed."
         },
@@ -3918,18 +3952,20 @@
         {
           "platform": "linkedin",
           "operation": "articles.create",
-          "availability": "approval-dependent"
+          "availability": "not-implemented-by-adapter",
+          "notes": "Ordinary article-link content is a Posts API format, but this adapter does not implement it and rejects content.link."
         },
         {
           "platform": "linkedin",
           "operation": "profile.update",
-          "availability": "approval-dependent",
+          "availability": "not-implemented-by-adapter",
           "notes": "Member profile writes use the Profile Edit API, which LinkedIn restricts to approved developers. This adapter does not implement it."
         },
         {
           "platform": "linkedin",
           "operation": "messages.write",
-          "availability": "unsupported-by-platform"
+          "availability": "not-implemented-by-adapter",
+          "notes": "LinkedIn has a restricted partner Messages API. This adapter implements no message send method."
         },
         {
           "platform": "linkedin",
@@ -3962,7 +3998,7 @@
           "requiredScopes": [
             "rw_organization_admin"
           ],
-          "notes": "Organization total followers only; authenticated member must administer the organization. No member-profile analytics claimed."
+          "notes": "Total followers for the configured organization from networkSizes with COMPANY_FOLLOWED_BY_MEMBER. The provider documents this count for any organization; SDK author binding still applies. No member-profile analytics claimed."
         },
         {
           "platform": "linkedin",
@@ -4015,29 +4051,31 @@
           "operation": "comments.read",
           "availability": "available",
           "requiredScopes": [
-            "w_member_social",
+            "r_member_social_feed",
             "r_member_social"
           ],
-          "notes": "Community Management product permissions and author post read access required. Analytics contains returned social-action counts only."
+          "notes": "Community Management product permissions and author post read access required. Member r_member_social is a closed grant unavailable to new apps. Analytics contains returned social-action counts only."
         },
         {
           "platform": "linkedin",
           "operation": "comments.write",
           "availability": "available",
           "requiredScopes": [
-            "w_member_social",
-            "r_member_social"
+            "w_member_social_feed",
+            "r_member_social",
+            "r_member_social_feed"
           ],
-          "notes": "Community Management product permissions and author post read access required. Analytics contains returned social-action counts only."
+          "notes": "Community Management product permissions and author post read access required. Member r_member_social is a closed grant unavailable to new apps. Analytics contains returned social-action counts only."
         },
         {
           "platform": "linkedin",
           "operation": "analytics.read",
           "availability": "available",
           "requiredScopes": [
+            "r_member_social_feed",
             "r_member_social"
           ],
-          "notes": "Community Management product permissions and author post read access required. Analytics contains returned social-action counts only."
+          "notes": "Community Management product permissions and author post read access required. Member r_member_social is a closed grant unavailable to new apps. Analytics contains returned social-action counts only."
         }
       ]
     }

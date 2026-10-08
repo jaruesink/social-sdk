@@ -14,6 +14,7 @@ import type {
   PreparedPublishTarget,
 } from "../core/types.js";
 import { createHttp, HttpError, type HttpOptions } from "../transport/http.js";
+import { providerErrorDecoder } from "../transport/provider-errors.js";
 import { isJsonValue } from "../transport/json.js";
 import { httpsUrl, upload } from "../transport/upload.js";
 import { definedFields } from "../core/fields.js";
@@ -95,14 +96,12 @@ export function managedHttp(
     headers.set(...authHeader(options.apiKey));
 
     if (context.targetIdempotencyKey && origin.includes("zernio.com"))
-      headers.set(
-        path === "/v1/posts" ? "x-request-id" : "Idempotency-Key",
-        context.targetIdempotencyKey,
-      );
+      headers.set("Idempotency-Key", context.targetIdempotencyKey);
 
     try {
       return await http({
         url,
+        decodeErrorBody: providerErrorDecoder(origin, path),
         headers,
         timeoutMs: remainingBudget(context),
         method,
@@ -120,40 +119,65 @@ export function managedHttp(
         error.dispatched &&
         (error.kind !== "http" || (error.status !== undefined && error.status >= 500));
 
+      const providerCode = error.data?.code;
+      const existingPostId = error.data?.existingPostId;
+
       throw new SocialError({
-        code: ambiguous
-          ? "ambiguous_outcome"
-          : error.status === 429
-            ? "rate_limited"
-            : error.kind === "cancelled"
-              ? "cancelled"
-              : error.kind === "timeout"
-                ? "timeout"
-                : error.status === 401
-                  ? "reconnect_required"
-                  : error.status === 403
-                    ? "missing_permission"
-                    : error.status === 402
-                      ? "billing_required"
-                      : error.status === 404
-                        ? "not_found"
-                        : error.status === 410
-                          ? "gone"
-                          : error.kind === "invalid-input"
-                            ? "invalid_input"
-                            : "upstream_failure",
+        code:
+          providerCode === "idempotency_conflict"
+            ? "idempotency_conflict"
+            : providerCode === "usage-capped"
+              ? "billing_required"
+              : providerCode === "quotaExceeded"
+                ? "rate_limited"
+                : providerCode === "media-duration-exceeded"
+                  ? "media_error"
+                  : ambiguous
+                    ? "ambiguous_outcome"
+                    : error.status === 429
+                      ? "rate_limited"
+                      : error.kind === "cancelled"
+                        ? "cancelled"
+                        : error.kind === "timeout"
+                          ? "timeout"
+                          : error.status === 401
+                            ? "reconnect_required"
+                            : error.status === 403
+                              ? "missing_permission"
+                              : error.status === 402
+                                ? "billing_required"
+                                : error.status === 404
+                                  ? "not_found"
+                                  : error.status === 410
+                                    ? "gone"
+                                    : error.kind === "invalid-input"
+                                      ? "invalid_input"
+                                      : "upstream_failure",
         operation: path,
         backend: context.backendInstance,
         correlationId: context.correlationId,
         message: error.message,
-        ...definedFields({ upstreamStatus: error.status }),
-        retryDisposition: ambiguous
-          ? { kind: "reconcile-first" }
-          : error.status === 401
-            ? { kind: "after-reconnect" }
-            : error.status === 429 && error.retryAfterMs !== undefined
+        ...definedFields({
+          upstreamStatus: error.status,
+          upstreamCode: providerCode,
+          details: existingPostId === undefined ? undefined : { existingPostId },
+        }),
+        retryDisposition:
+          providerCode === "idempotency_conflict" && existingPostId !== undefined
+            ? { kind: "reconcile-first" }
+            : providerCode === "idempotency_conflict" && error.retryAfterMs !== undefined
               ? { kind: "after-delay", delayMs: error.retryAfterMs }
-              : { kind: "never" },
+              : providerCode === "idempotency_conflict"
+                ? { kind: "reconcile-first" }
+                : providerCode !== undefined
+                  ? { kind: "never" }
+                  : ambiguous
+                    ? { kind: "reconcile-first" }
+                    : error.status === 401
+                      ? { kind: "after-reconnect" }
+                      : error.status === 429 && error.retryAfterMs !== undefined
+                        ? { kind: "after-delay", delayMs: error.retryAfterMs }
+                        : { kind: "never" },
       });
     }
   };
@@ -291,6 +315,7 @@ export function managedOptionIssues(
     if (config["brandedContent"] === true && config["privacy"] === "SELF_ONLY")
       fail("tiktok.branded_privacy", "TikTok branded content cannot use private visibility.");
     const media = target.content.media ?? [];
+    const video = media.length === 1 && media[0]?.kind === "video";
 
     if (
       media.some((item) => item.kind === "video") &&
@@ -327,6 +352,17 @@ export function managedOptionIssues(
 
     if (config["autoAddMusic"] !== undefined && !isBoolean(config["autoAddMusic"]))
       fail("tiktok.auto_add_music", "autoAddMusic must be a boolean.");
+
+    if (video) {
+      if (config["title"] !== undefined)
+        fail("tiktok.title", "Video captions use content.text; title is a photo-only option.");
+      if (config["description"] !== undefined)
+        fail("tiktok.description", "Description is a photo-only option.");
+      if (config["mediaType"] !== undefined)
+        fail("tiktok.media_type", "mediaType is a photo-only option.");
+      if (config["autoAddMusic"] !== undefined)
+        fail("tiktok.auto_add_music", "autoAddMusic is a photo-only option.");
+    }
   }
 
   return issues;
