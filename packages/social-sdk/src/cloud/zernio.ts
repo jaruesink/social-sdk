@@ -412,7 +412,7 @@ export function zernio(options: ManagedOptions) {
           native["replySettings"] = string(config["replySettings"]);
 
         if (target.account.platform === "tiktok") {
-          const video = media.length === 1 && media[0]?.kind === "video";
+          const video = media.length === 1 && media[0]?.["kind"] === "video";
           native["privacyLevel"] = string(config["privacy"]);
           native["contentPreviewConfirmed"] = true;
           native["expressConsentGiven"] = true;
@@ -452,7 +452,9 @@ export function zernio(options: ManagedOptions) {
 
         // Zernio photo posts: `content` is the photo title (≤90). Prefer options.title when set.
         const tiktokVideo =
-          target.account.platform === "tiktok" && media.length === 1 && media[0]?.kind === "video";
+          target.account.platform === "tiktok" &&
+          media.length === 1 &&
+          media[0]?.["kind"] === "video";
 
         const tiktokTitle =
           target.account.platform === "tiktok" && !tiktokVideo && isString(config["title"])
